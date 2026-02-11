@@ -3,185 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Systems R&D | Project Navigator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>Systems R&D | Strategic Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #020617;
-            --card-bg: rgba(30, 41, 59, 0.5);
+            --card-bg: rgba(15, 23, 42, 0.7);
             --border: rgba(148, 163, 184, 0.1);
-            --accent: #6366f1;
+            --accent-intel: #6366f1; /* Indigo */
+            --accent-infra: #06b6d4; /* Cyan */
+            --accent-audit: #f43f5e; /* Rose */
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 80px 20px;
+            padding: 0;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        header { text-align: center; margin-bottom: 60px; max-width: 800px; }
-        h1 { font-size: 3rem; font-weight: 900; letter-spacing: -0.05em; margin: 0; }
-        .tagline { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 0.9rem; margin-top: 10px; text-transform: uppercase; }
+        /* Executive Header */
+        .command-bar {
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
+        .identity h2 { font-size: 0.9rem; margin: 0; letter-spacing: 0.1em; color: var(--text-main); }
+        .identity p { font-size: 0.7rem; margin: 5px 0 0; color: var(--accent-intel); font-family: 'JetBrains Mono'; }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.75rem;
+            margin-left: 25px;
+            font-family: 'JetBrains Mono';
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--text-main); }
+
+        header { text-align: center; margin: 80px 0 40px; max-width: 800px; padding: 0 20px; }
+        h1 { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.05em; margin: 0; }
+        .hero-tag { font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 0.8rem; margin-top: 15px; }
+
+        /* Grid Logic */
         .matrix-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            max-width: 1100px;
+            gap: 25px;
+            max-width: 1200px;
             width: 100%;
+            padding: 0 40px 100px;
         }
 
-        .category-label {
+        .tier-label {
             grid-column: span 3;
             font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.3em;
-            color: var(--accent);
-            margin-top: 40px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
+            letter-spacing: 0.4em;
+            margin-top: 60px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
+        .tier-label::after { content: ''; height: 1px; flex-grow: 1; background: var(--border); }
 
+        /* Card Styling */
         .project-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            padding: 30px;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 35px;
+            border-radius: 20px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
-            overflow: hidden;
             text-decoration: none;
             color: inherit;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(12px);
         }
 
         .project-card:hover {
-            border-color: var(--accent);
-            background: rgba(99, 102, 241, 0.05);
-            transform: translateY(-5px);
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(30, 41, 59, 0.4);
         }
 
-        .project-card h3 {
-            font-size: 1.1rem;
-            margin: 0 0 10px 0;
-            font-weight: 700;
-        }
+        /* Tier Theming */
+        .tier-1 { border-left: 4px solid var(--accent-intel); }
+        .tier-1:hover { border-color: var(--accent-intel); box-shadow: 0 0 40px rgba(99, 102, 241, 0.15); }
+        
+        .tier-2 { border-left: 4px solid var(--accent-infra); }
+        .tier-2:hover { border-color: var(--accent-infra); box-shadow: 0 0 40px rgba(6, 182, 212, 0.15); }
 
-        .project-card p {
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
+        .tier-3 { border-left: 4px solid var(--accent-audit); }
+        .tier-3:hover { border-color: var(--accent-audit); box-shadow: 0 0 40px rgba(244, 63, 94, 0.15); }
 
-        .tech-pill {
-            font-family: 'JetBrains Mono', monospace;
+        .project-card h3 { font-size: 1.25rem; margin: 0 0 12px 0; font-weight: 800; }
+        .project-card p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; flex-grow: 1; }
+
+        /* Telemetry Status */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            background: #4ade80;
+            box-shadow: 0 0 10px #4ade80;
+            animation: pulse 2s infinite;
+        }
+        .status-txt {
+            font-family: 'JetBrains Mono';
             font-size: 0.65rem;
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--accent);
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-right: 5px;
-        }
-
-        .status {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 0.6rem;
-            font-family: 'JetBrains Mono', monospace;
-            opacity: 0.5;
+            top: 20px;
+            right: 25px;
+            color: var(--text-dim);
         }
 
-        @media (max-width: 900px) {
-            .matrix-grid { grid-template-columns: 1fr; }
-            .category-label { grid-column: span 1; }
+        .sunset { filter: grayscale(1); opacity: 0.6; }
+        .sunset .status-dot { background: #94a3b8; box-shadow: none; animation: none; }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.3); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .tech-tags { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { font-family: 'JetBrains Mono'; font-size: 0.6rem; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 100px; color: var(--text-dim); }
+
+        /* Footer Telemetry */
+        footer {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0,0,0,0.5);
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-family: 'JetBrains Mono';
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            letter-spacing: 0.2em;
+            position: fixed;
+            bottom: 0;
+        }
+
+        @media (max-width: 1000px) {
+            .matrix-grid { grid-template-columns: 1fr; padding: 0 20px 100px; }
+            .tier-label { grid-column: span 1; }
         }
     </style>
 </head>
 <body>
 
+<div class="command-bar">
+    <div class="identity">
+        <h2>[YOUR NAME]</h2>
+        <p>SYSTEMS_ARCHITECT // GROWTH_OPS</p>
+    </div>
+    <div class="nav-links">
+        <a href="#">LINKEDIN</a>
+        <a href="#">GITHUB</a>
+        <a href="#">DOWNLOAD_CV</a>
+    </div>
+</div>
+
 <header>
     <h1>SYSTEMS R&D</h1>
-    <div class="tagline">9-Tier Autonomous Innovation Portfolio</div>
+    <p class="hero-tag">TRANSITIONING ENTERPRISE ARCHITECTURE TO AGENTIC DISCOVERY LAYER</p>
 </header>
 
 <div class="matrix-grid">
-    <div class="category-label">Tier I: Agentic Intelligence</div>
+    <div class="tier-label" style="color: var(--accent-intel);">Tier I: Agentic Intelligence</div>
     
-    <a href="https://bittensaur-website.vercel.app/" class="project-card">
-        <span class="status">ACTIVE</span>
+    <a href="https://bittensaur-website.vercel.app/" class="project-card tier-1">
+        <div class="status-txt"><span class="status-dot"></span>Active</div>
         <h3>Bittensaur_Rex</h3>
         <p>Apex Stoic Node: Multi-agent swarm governance and TAO protocol enforcement.</p>
-        <span class="tech-pill">BITTENSOR</span><span class="tech-pill">MULTI-AGENT</span>
+        <div class="tech-tags"><span class="tag">BITTENSOR</span><span class="tag">MULTI-AGENT</span></div>
     </a>
 
-    <a href="https://arise-agents.netlify.app/" class="project-card">
-        <span class="status">ACTIVE</span>
+    <a href="https://arise-agents.netlify.app/" class="project-card tier-1">
+        <div class="status-txt"><span class="status-dot"></span>Active</div>
         <h3>Arise Agents</h3>
         <p>Discovery Frameworks: Autonomous search agents specialized in LLM citation optimization.</p>
-        <span class="tech-pill">LANGCHAIN</span><span class="tech-pill">GEO</span>
+        <div class="tech-tags"><span class="tag">LANGCHAIN</span><span class="tag">GEO</span></div>
     </a>
 
-    <a href="https://www.darkgemini.com/" class="project-card">
-        <span class="status">R&D</span>
+    <a href="https://www.darkgemini.com/" class="project-card tier-1">
+        <div class="status-txt"><span class="status-dot" style="background: #fbbf24; box-shadow: 0 0 10px #fbbf24;"></span>R&D</div>
         <h3>Dark Gemini</h3>
-        <p>Future-Tech R&D: Exploring 8D intelligence and quantum-scaled infrastructure paradigms.</p>
-        <span class="tech-pill">QUANTUM-THEORY</span><span class="tech-pill">8D</span>
+        <p>Theoretical framework for 8D intelligence and quantum-scaled infrastructure paradigms.</p>
+        <div class="tech-tags"><span class="tag">QUANTUM-THEORY</span><span class="tag">8D</span></div>
     </a>
 
-    <div class="category-label">Tier II: Scaled Infrastructure</div>
+    <div class="tier-label" style="color: var(--accent-infra);">Tier II: Scaled Infrastructure</div>
 
-    <a href="https://coreweaverlabs.vercel.app/" class="project-card">
-        <span class="status">ACTIVE</span>
+    <a href="https://coreweaverlabs.vercel.app/" class="project-card tier-2">
+        <div class="status-txt"><span class="status-dot"></span>Active</div>
         <h3>Coreweaver Labs</h3>
         <p>The Loom: High-performance engine weaving agents into enterprise data fabrics.</p>
-        <span class="tech-pill">VERCEL</span><span class="tech-pill">DATA-FABRIC</span>
+        <div class="tech-tags"><span class="tag">VERCEL</span><span class="tag">DATA-FABRIC</span></div>
     </a>
 
-    <a href="https://monumentlabs.space/" class="project-card">
-        <span class="status">ACTIVE</span>
+    <a href="https://monumentlabs.space/" class="project-card tier-2">
+        <div class="status-txt"><span class="status-dot"></span>Active</div>
         <h3>Monument Labs</h3>
-        <p>Performance Lab: Stress-testing Edge SEO and rendering for 15M+ URL environments.</p>
-        <span class="tech-pill">EDGE-SEO</span><span class="tech-pill">15M+ URL</span>
+        <p>Stress-testing Edge SEO and rendering for 15M+ URL environments.</p>
+        <div class="tech-tags"><span class="tag">EDGE-SEO</span><span class="tag">15M+ URL</span></div>
     </a>
 
-    <a href="https://autonomousresourcemanagement.xyz/" class="project-card">
-        <span class="status">ACTIVE</span>
-        <h3>Autonomous Resource Management</h3>
-        <p>Orchestration: Decentralized frameworks for automated web infrastructure scaling.</p>
-        <span class="tech-pill">DECENTRALIZED</span><span class="tech-pill">P2P</span>
+    <a href="https://autonomousresourcemanagement.xyz/" class="project-card tier-2">
+        <div class="status-txt"><span class="status-dot"></span>Active</div>
+        <h3>Autonomous Resource</h3>
+        <p>Decentralized frameworks for automated web infrastructure scaling.</p>
+        <div class="tech-tags"><span class="tag">DECENTRALIZED</span><span class="tag">P2P</span></div>
     </a>
 
-    <div class="category-label">Tier III: Forensic Integrity</div>
+    <div class="tier-label" style="color: var(--accent-audit);">Tier III: Forensic Integrity</div>
 
-    <a href="https://operon-forensics.netlify.app/" class="project-card">
-        <span class="status">ACTIVE</span>
+    <a href="https://operon-forensics.netlify.app/" class="project-card tier-3">
+        <div class="status-txt"><span class="status-dot"></span>Active</div>
         <h3>Operon Forensics</h3>
-        <p>Audit Layer: Adversarial AI detection and provenance tracking for synthetic assets.</p>
-        <span class="tech-pill">FORENSICS</span><span class="tech-pill">ADVERSARIAL</span>
+        <p>Adversarial AI detection and provenance tracking for synthetic assets.</p>
+        <div class="tech-tags"><span class="tag">FORENSICS</span><span class="tag">ADVERSARIAL</span></div>
     </a>
 
-    <a href="https://blockchainanalytics.space/" class="project-card">
-        <span class="status">ACTIVE</span>
+    <a href="https://blockchainanalytics.space/" class="project-card tier-3">
+        <div class="status-txt"><span class="status-dot"></span>Active</div>
         <h3>Blockchain Analytics</h3>
-        <p>On-Chain Data: Indexing verifiable transaction data via GraphQL for search authority.</p>
-        <span class="tech-pill">GRAPHQL</span><span class="tech-pill">WEB3</span>
+        <p>Indexing verifiable transaction data via GraphQL for search authority.</p>
+        <div class="tech-tags"><span class="tag">GRAPHQL</span><span class="tag">WEB3</span></div>
     </a>
 
-    <div class="project-card">
-        <span class="status">SUNSET</span>
+    <div class="project-card tier-3 sunset">
+        <div class="status-txt"><span class="status-dot"></span>Sunset</div>
         <h3>Silent Cartographer</h3>
-        <p>Legacy Mapping: Proprietary stealth agents used to chart hidden semantic entity graphs.</p>
-        <span class="tech-pill">STEALTH</span><span class="tech-pill">ENTITY-MAPPING</span>
+        <p>Legacy Mapping: Proprietary stealth agents used to chart semantic entity graphs.</p>
+        <div class="tech-tags"><span class="tag">STEALTH</span><span class="tag">ENTITY-MAPPING</span></div>
     </div>
 </div>
+
+<footer>
+    SYSTEM_STATUS: OPERATIONAL // AGENTS_DEPLOYED: 5 // TOTAL_RESOURCES: 15M+ URLS // INTEGRITY: STOIC
+</footer>
 
 </body>
 </html>
